@@ -1,0 +1,52 @@
+﻿@page "/"
+@page "/metronome"
+@inject IJSRuntime JS
+
+<PageTitle>Metronome</PageTitle>
+
+<div class="metronome-container">
+
+    <h2>Metronome</h2>
+
+    <div class="bpm-display">
+        @Bpm <span>BPM</span>
+    </div>
+
+    <input type="range"
+           min="40"
+           max="220"
+    @bind="Bpm"
+    @bind:event="oninput"
+           class="slider" />
+
+    <div class="button-row">
+        <button class="btn btn-primary btn-lg"
+        @onclick="ToggleMetronome">
+            @(Running ? "■ Stop" : "▶ Start")
+        </button>
+    </div>
+
+</div>
+
+@code {
+
+    private int Bpm = 85;
+
+    private bool Running;
+
+    async Task ToggleMetronome()
+    {
+        Running = !Running;
+
+        if (Running)
+            await JS.InvokeVoidAsync("metronome.start", Bpm);
+        else
+            await JS.InvokeVoidAsync("metronome.stop");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Running)
+            await JS.InvokeVoidAsync("metronome.setTempo", Bpm);
+    }
+}
