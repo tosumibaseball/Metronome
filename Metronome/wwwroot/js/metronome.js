@@ -4,12 +4,20 @@
 
     bpm: 85,
 
+    audioContext: null,
+
 
     start: function (bpm) {
 
         this.bpm = bpm;
 
         this.stop();
+
+        if (!this.audioContext) {
+            this.audioContext =
+                new (window.AudioContext ||
+                    window.webkitAudioContext)();
+        }
 
         this.timer = setInterval(() => {
 
@@ -47,36 +55,98 @@
 
     tick: function () {
 
-        let element =
+        this.animateBeat();
+
+        this.playClick();
+
+    },
+
+
+    animateBeat: function () {
+
+        let beat =
             document.querySelector(".beat");
 
+        if (beat) {
 
-        if (element) {
-            element.classList.remove("active");
+            beat.classList.remove("active");
 
-            void element.offsetWidth;
+            void beat.offsetWidth;
 
-            element.classList.add("active");
+            beat.classList.add("active");
+
         }
 
+    },
 
-        let audio =
-            new AudioContext();
+
+    playClick: function () {
+
+        if (!this.audioContext)
+            return;
 
 
         let oscillator =
-            audio.createOscillator();
+            this.audioContext.createOscillator();
+
+        let gain =
+            this.audioContext.createGain();
 
 
-        oscillator.frequency.value = 1000;
+        oscillator.frequency.value = 1200;
 
-        oscillator.connect(
-            audio.destination);
+        gain.gain.value = 0.15;
+
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            this.audioContext.destination);
+
 
         oscillator.start();
 
         oscillator.stop(
-            audio.currentTime + .05);
+            this.audioContext.currentTime + 0.05);
+
+    },
+
+
+    registerKeyboard: function (dotnet) {
+
+        document.addEventListener(
+            "keydown",
+            function (e) {
+
+
+                if (e.code === "Space") {
+
+                    e.preventDefault();
+
+                    dotnet.invokeMethodAsync(
+                        "KeyboardToggle");
+
+                }
+
+
+                if (e.code === "ArrowUp") {
+
+                    dotnet.invokeMethodAsync(
+                        "KeyboardTempoChange",
+                        1);
+
+                }
+
+
+                if (e.code === "ArrowDown") {
+
+                    dotnet.invokeMethodAsync(
+                        "KeyboardTempoChange",
+                        -1);
+
+                }
+
+            });
 
     }
 

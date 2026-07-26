@@ -1,6 +1,6 @@
 ﻿@page "/"
 @page "/Piano"
-
+@implements IDisposable
 @inject IJSRuntime JS
 
 <PageTitle>Metronome</PageTitle>
@@ -66,7 +66,49 @@
 
 
 @code {
+    private DotNetObjectReference<Piano>? dotNetRef;
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef =
+                DotNetObjectReference.Create(this);
+
+            await JS.InvokeVoidAsync(
+                "metronome.registerKeyboard",
+                dotNetRef);
+        }
+    }
+
+
+    [JSInvokable]
+    public async Task KeyboardTempoChange(int amount)
+    {
+        await InvokeAsync(async () =>
+        {
+            await ChangeTempo(amount);
+            StateHasChanged();
+        });
+    }
+
+
+    [JSInvokable]
+    public async Task KeyboardToggle()
+    {
+        await InvokeAsync(async () =>
+        {
+            await ToggleMetronome();
+            StateHasChanged();
+        });
+    }
+
+
+    public void Dispose()
+    {
+        dotNetRef?.Dispose();
+    }
     private int Bpm = 85;
 
     private bool Running;
