@@ -1,31 +1,111 @@
 ﻿.metronome-container {
-    max-width: 600px;
-    margin: auto;
-    padding: 40px;
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 30px;
     text-align: center;
+    background: #202020;
+    color: white;
+    border-radius: 25px;
 }
 
-.bpm-display {
-    font-size: 80px;
-    font-weight: 300;
-}
 
-    .bpm-display span {
-        font-size: 32px;
-        color: gray;
+    .metronome-container h1 {
+        font-size: 42px;
+        margin-bottom: 30px;
     }
 
-.slider {
+
+.bpm-display {
+    margin-bottom: 20px;
+}
+
+
+.bpm-number {
+    font-size: 110px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+
+.bpm-label {
+    font-size: 28px;
+    opacity: .7;
+}
+
+
+
+.beat-indicator {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.beat {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #555;
+}
+
+
+    .beat.active {
+        animation: pulse .3s;
+    }
+
+
+@keyframes pulse {
+
+    from {
+        transform: scale(1);
+        background: white;
+    }
+
+    to {
+        transform: scale(1.6);
+        background: #00ff99;
+    }
+}
+
+
+
+.tempo-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+
+
+.tempo-button {
+    width: 70px;
+    height: 55px;
+    font-size: 22px;
+    border-radius: 15px;
+}
+
+
+
+.tempo-slider {
     width: 100%;
-    margin: 30px 0;
+    margin: 20px 0;
 }
 
-.button-row {
-    margin-top: 30px;
+
+
+.start-button {
+    width: 220px;
+    height: 70px;
+    font-size: 30px;
+    border-radius: 20px;
+    background: #198754;
+    color: white;
 }
 
-.btn-lg {
-    width: 180px;
-    height: 60px;
-    font-size: 24px;
-}
+
+
+    .start-button.stop {
+        background: #dc3545;
+    }

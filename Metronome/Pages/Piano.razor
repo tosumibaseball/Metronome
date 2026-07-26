@@ -1,32 +1,69 @@
 ﻿@page "/"
 @page "/Piano"
+
 @inject IJSRuntime JS
 
 <PageTitle>Metronome</PageTitle>
 
 <div class="metronome-container">
 
-    <h2>Metronome</h2>
+    <h1>Metronome</h1>
 
     <div class="bpm-display">
-        @Bpm <span>BPM</span>
+        <div class="bpm-number">@Bpm</div>
+        <div class="bpm-label">BPM</div>
     </div>
+
+
+    <div class="beat-indicator">
+        <div class="beat @(Running ? "active" : "")"></div>
+    </div>
+
+
+    <div class="tempo-controls">
+
+        <button class="tempo-button"
+        @onclick="() => ChangeTempo(-10)">
+            -10
+        </button>
+
+        <button class="tempo-button"
+        @onclick="() => ChangeTempo(-1)">
+            -1
+        </button>
+
+
+        <button class="tempo-button"
+        @onclick="() => ChangeTempo(1)">
+            +1
+        </button>
+
+        <button class="tempo-button"
+        @onclick="() => ChangeTempo(10)">
+            +10
+        </button>
+
+    </div>
+
 
     <input type="range"
            min="40"
            max="220"
-    @bind="Bpm"
-    @bind:event="oninput"
-           class="slider" />
+           value="@Bpm"
+    @oninput="TempoChanged"
+           class="tempo-slider" />
 
-    <div class="button-row">
-        <button class="btn btn-primary btn-lg"
-        @onclick="ToggleMetronome">
-            @(Running ? "■ Stop" : "▶ Start")
-        </button>
-    </div>
+
+    <button class="start-button @(Running ? "stop" : "")"
+    @onclick="ToggleMetronome">
+
+        @(Running ? "■ Stop" : "▶ Start")
+
+    </button>
+
 
 </div>
+
 
 @code {
 
@@ -34,19 +71,57 @@
 
     private bool Running;
 
-    async Task ToggleMetronome()
+
+    private async Task ToggleMetronome()
     {
         Running = !Running;
 
         if (Running)
-            await JS.InvokeVoidAsync("metronome.start", Bpm);
+        {
+            await JS.InvokeVoidAsync(
+                "metronome.start",
+                Bpm);
+        }
         else
-            await JS.InvokeVoidAsync("metronome.stop");
+        {
+            await JS.InvokeVoidAsync(
+                "metronome.stop");
+        }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    private async Task ChangeTempo(int amount)
     {
+        Bpm += amount;
+
+        if (Bpm < 40)
+            Bpm = 40;
+
+        if (Bpm > 220)
+            Bpm = 220;
+
+
         if (Running)
-            await JS.InvokeVoidAsync("metronome.setTempo", Bpm);
+        {
+            await JS.InvokeVoidAsync(
+                "metronome.setTempo",
+                Bpm);
+        }
     }
+
+
+    private async Task TempoChanged(
+        ChangeEventArgs e)
+    {
+        Bpm = int.Parse(e.Value!.ToString()!);
+
+
+        if (Running)
+        {
+            await JS.InvokeVoidAsync(
+                "metronome.setTempo",
+                Bpm);
+        }
+    }
+
 }

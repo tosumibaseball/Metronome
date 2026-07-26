@@ -2,60 +2,81 @@
 
     timer: null,
 
-    audioCtx: null,
+    bpm: 85,
 
-    click() {
 
-        if (!this.audioCtx)
-            this.audioCtx = new AudioContext();
+    start: function (bpm) {
 
-        const osc = this.audioCtx.createOscillator();
-        const gain = this.audioCtx.createGain();
-
-        osc.type = "square";
-        osc.frequency.value = 1000;
-
-        gain.gain.value = 0.25;
-
-        osc.connect(gain);
-        gain.connect(this.audioCtx.destination);
-
-        osc.start();
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.0001,
-            this.audioCtx.currentTime + 0.04);
-
-        osc.stop(this.audioCtx.currentTime + 0.04);
-    },
-
-    start(bpm) {
+        this.bpm = bpm;
 
         this.stop();
 
-        const interval = 60000 / bpm;
-
-        this.click();
-
         this.timer = setInterval(() => {
-            this.click();
-        }, interval);
+
+            this.tick();
+
+        }, 60000 / this.bpm);
 
     },
 
-    stop() {
 
-        if (this.timer)
+    stop: function () {
+
+        if (this.timer) {
+
             clearInterval(this.timer);
+            this.timer = null;
 
-        this.timer = null;
+        }
 
     },
 
-    setTempo(bpm) {
 
-        if (this.timer)
+    setTempo: function (bpm) {
+
+        this.bpm = bpm;
+
+        if (this.timer) {
+
             this.start(bpm);
+
+        }
+
+    },
+
+
+    tick: function () {
+
+        let element =
+            document.querySelector(".beat");
+
+
+        if (element) {
+            element.classList.remove("active");
+
+            void element.offsetWidth;
+
+            element.classList.add("active");
+        }
+
+
+        let audio =
+            new AudioContext();
+
+
+        let oscillator =
+            audio.createOscillator();
+
+
+        oscillator.frequency.value = 1000;
+
+        oscillator.connect(
+            audio.destination);
+
+        oscillator.start();
+
+        oscillator.stop(
+            audio.currentTime + .05);
 
     }
 
