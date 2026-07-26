@@ -99,3 +99,33 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+@media (max-width:600px) {
+
+
+    .metronome-container {
+        margin: 10px;
+        padding: 25px 15px;
+        border-radius: 20px;
+    }
+
+
+        .metronome-container h1 {
+            font-size: 32px;
+        }
+
+
+    .bpm-number {
+        font-size: 90px;
+    }
+
+
+    .tempo-button.small {
+        width: 55px;
+    }
+
+
+    .tempo-button.main {
+        width: 60px;
+        height: 60px;
+    }
+}

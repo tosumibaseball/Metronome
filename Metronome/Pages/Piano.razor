@@ -39,26 +39,30 @@
 
     <div class="tempo-controls">
 
-        <button class="tempo-button"
-                @onclick="() => ChangeTempo(-10)">
+        <button class="tempo-button small"
+        @onclick="() => ChangeTempo(-10)">
             -10
         </button>
 
-
-        <button class="tempo-button"
-                @onclick="() => ChangeTempo(-1)">
-            -1
+        <button class="tempo-button main"
+        @onclick="() => ChangeTempo(-1)">
+            −
         </button>
 
 
-        <button class="tempo-button"
-                @onclick="() => ChangeTempo(1)">
-            +1
+        <div class="tempo-adjust-label">
+            Tempo
+        </div>
+
+
+        <button class="tempo-button main"
+        @onclick="() => ChangeTempo(1)">
+            +
         </button>
 
 
-        <button class="tempo-button"
-                @onclick="() => ChangeTempo(10)">
+        <button class="tempo-button small"
+        @onclick="() => ChangeTempo(10)">
             +10
         </button>
 
