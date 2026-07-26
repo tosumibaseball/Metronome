@@ -111,3 +111,27 @@
     .start-button.stop {
         background: #dc3545;
     }
+
+.beat-display {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+
+.setting {
+    margin: 25px 0;
+}
+
+
+    .setting label {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+
+    .setting select {
+        font-size: 22px;
+        padding: 8px;
+        border-radius: 10px;
+    }

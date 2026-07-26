@@ -1,17 +1,33 @@
 ﻿@page "/"
 @page "/Piano"
+
 @implements IDisposable
+
 @inject IJSRuntime JS
 
 <PageTitle>Metronome</PageTitle>
+
 
 <div class="metronome-container">
 
     <h1>Metronome</h1>
 
+
     <div class="bpm-display">
-        <div class="bpm-number">@Bpm</div>
-        <div class="bpm-label">BPM</div>
+
+        <div class="bpm-number">
+            @Bpm
+        </div>
+
+        <div class="bpm-label">
+            BPM
+        </div>
+
+    </div>
+
+
+    <div class="beat-display">
+        Beat @CurrentBeat / @BeatsPerMeasure
     </div>
 
 
@@ -20,142 +36,181 @@
     </div>
 
 
+
     <div class="tempo-controls">
 
         <button class="tempo-button"
-        @onclick="() => ChangeTempo(-10)">
+                @onclick="() => ChangeTempo(-10)">
             -10
         </button>
 
+
         <button class="tempo-button"
-        @onclick="() => ChangeTempo(-1)">
+                @onclick="() => ChangeTempo(-1)">
             -1
         </button>
 
 
         <button class="tempo-button"
-        @onclick="() => ChangeTempo(1)">
+                @onclick="() => ChangeTempo(1)">
             +1
         </button>
 
+
         <button class="tempo-button"
-        @onclick="() => ChangeTempo(10)">
+                @onclick="() => ChangeTempo(10)">
             +10
         </button>
 
     </div>
 
 
+
     <input type="range"
            min="40"
            max="220"
            value="@Bpm"
-    @oninput="TempoChanged"
+           @oninput="TempoChanged"
            class="tempo-slider" />
 
 
+
+    <div class="setting">
+
+        <label>
+            Time Signature
+        </label>
+
+        <select value="@BeatsPerMeasure"
+        @onchange="TimeSignatureChanged">
+
+            <option value="2">
+                2 / 4
+            </option>
+
+            <option value="3">
+                3 / 4
+            </option>
+
+            <option value="4">
+                4 / 4
+            </option>
+
+            <option value="6">
+                6 / 8
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <div class="setting">
+
+        <label>
+            Volume
+        </label>
+
+
+        <input type="range"
+               min="0"
+               max="1"
+               step="0.05"
+               value="@Volume"
+               @oninput="VolumeChanged"
+               class="tempo-slider" />
+
+    </div>
+
+
+
+
     <button class="start-button @(Running ? "stop" : "")"
-    @onclick="ToggleMetronome">
+            @onclick="ToggleMetronome">
 
         @(Running ? "■ Stop" : "▶ Start")
 
     </button>
 
 
+
 </div>
 
 
+
 @code {
-    private DotNetObjectReference<Piano>? dotNetRef;
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            dotNetRef =
-                DotNetObjectReference.Create(this);
-
-            await JS.InvokeVoidAsync(
-                "metronome.registerKeyboard",
-                dotNetRef);
-        }
-    }
-
-
-    [JSInvokable]
-    public async Task KeyboardTempoChange(int amount)
-    {
-        await InvokeAsync(async () =>
-        {
-            await ChangeTempo(amount);
-            StateHasChanged();
-        });
-    }
-
-
-    [JSInvokable]
-    public async Task KeyboardToggle()
-    {
-        await InvokeAsync(async () =>
-        {
-            await ToggleMetronome();
-            StateHasChanged();
-        });
-    }
-
-
-    public void Dispose()
-    {
-        dotNetRef?.Dispose();
-    }
     private int Bpm = 85;
 
     private bool Running;
 
 
+    private int BeatsPerMeasure = 4;
+
+    private int CurrentBeat = 1;
+
+
+    private double Volume = 0.5;
+
+
+
     private async Task ToggleMetronome()
     {
+
         Running = !Running;
+
 
         if (Running)
         {
             await JS.InvokeVoidAsync(
                 "metronome.start",
-                Bpm);
+                Bpm,
+                BeatsPerMeasure,
+                Volume);
         }
         else
         {
             await JS.InvokeVoidAsync(
                 "metronome.stop");
         }
+
     }
+
 
 
     private async Task ChangeTempo(int amount)
     {
+
         Bpm += amount;
+
 
         if (Bpm < 40)
             Bpm = 40;
+
 
         if (Bpm > 220)
             Bpm = 220;
 
 
+
         if (Running)
         {
             await JS.InvokeVoidAsync(
                 "metronome.setTempo",
                 Bpm);
         }
+
     }
+
 
 
     private async Task TempoChanged(
         ChangeEventArgs e)
     {
-        Bpm = int.Parse(e.Value!.ToString()!);
+
+        Bpm =
+            int.Parse(e.Value!.ToString()!);
 
 
         if (Running)
@@ -164,6 +219,45 @@
                 "metronome.setTempo",
                 Bpm);
         }
+
+    }
+
+
+
+    private async Task TimeSignatureChanged(
+        ChangeEventArgs e)
+    {
+
+        BeatsPerMeasure =
+            int.Parse(e.Value!.ToString()!);
+
+
+        await JS.InvokeVoidAsync(
+            "metronome.setBeatsPerMeasure",
+            BeatsPerMeasure);
+
+    }
+
+
+
+    private async Task VolumeChanged(
+        ChangeEventArgs e)
+    {
+
+        Volume =
+            double.Parse(e.Value!.ToString()!);
+
+
+        await JS.InvokeVoidAsync(
+            "metronome.setVolume",
+            Volume);
+
+    }
+
+
+    public void Dispose()
+    {
+
     }
 
 }
